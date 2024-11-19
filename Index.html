@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Météo - Prévisions Semaine</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Arrière-plan dégradé moderne */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, #74ebd5 0%, #acb6e5 100%);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        /* Conteneur avec effet glassmorphism */
+        .container {
+            max-width: 500px;
+            width: 100%;
+            padding: 40px 30px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            text-align: center;
+            animation: fadeIn 0.8s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        /* Titre principal */
+        h1 {
+            font-size: 2.8rem;
+            margin-bottom: 25px;
+            color: #004085;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-shadow: 0 4px 12px rgba(0, 64, 133, 0.2);
+        }
+
+        /* Formulaire */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            align-items: center;
+        }
+
+        /* Champ d'entrée avec effets modernes */
+        input[type="text"] {
+            padding: 15px 20px;
+            width: 100%;
+            max-width: 400px;
+            font-size: 1.1rem;
+            border: 2px solid #007bff;
+            border-radius: 30px;
+            transition: 0.3s;
+            outline: none;
+            background: rgba(255, 255, 255, 0.8);
+            color: #333;
+            box-shadow: 0 4px 16px rgba(0, 123, 255, 0.15);
+        }
+
+        input[type="text"]:focus {
+            border-color: #0056b3;
+            box-shadow: 0 6px 20px rgba(0, 123, 255, 0.4);
+        }
+
+        /* Bouton modernisé */
+        button {
+            padding: 14px 30px;
+            width: 100%;
+            max-width: 400px;
+            font-size: 1.2rem;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s;
+            box-shadow: 0 8px 24px rgba(0, 123, 255, 0.4);
+        }
+
+        button:hover {
+            background-color: #0056b3;
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(0, 123, 255, 0.5);
+        }
+
+        /* Informations météorologiques */
+        .weather-info {
+            margin-top: 40px;
+            padding: 25px;
+            border-radius: 20px;
+            background-color: rgba(255, 255, 255, 0.75);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease-in-out;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 1s forwards 0.5s;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Style des informations météo */
+        .weather-info h2 {
+            font-size: 2rem;
+            color: #007bff;
+            margin-bottom: 15px;
+        }
+
+        .weather-info p {
+            font-size: 1.2rem;
+            margin: 12px 0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: 500;
+        }
+
+        .weather-info strong {
+            color: #0056b3;
+            font-size: 1.4rem;
+        }
+
+        /* Icônes météo */
+        .weather-info .icon {
+            font-size: 1.6rem;
+            color: #007bff;
+        }
+
+        /* Style des messages d'erreur */
+        .error {
+            color: #e74c3c;
+            margin-top: 20px;
+            font-size: 1.2rem;
+            font-weight: 600;
+        }
+
+        /* Media Queries pour rendre l'interface responsive */
+        @media (max-width: 480px) {
+            h1 {
+                font-size: 2rem;
+            }
+            .container {
+                padding: 20px;
+            }
+            input[type="text"], button {
+                font-size: 1.1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Météo</h1>
+        <form method="POST">
+            <input type="text" name="city" placeholder="Entrez une ville" required>
+            <button type="submit">Obtenir la météo</button>
+        </form>
+
+        {% if weather %}
+        <div class="weather-info">
+            <h2>{{ weather.location }}</h2>
+            {% for forecast in weather.forecasts %}
+                <p>
+                    <span>{{ forecast.date }}</span>
+                    <span><i class="fas fa-temperature-high icon"></i> Max: {{ forecast.max }}°C</span>
+                    <span><i class="fas fa-temperature-low icon"></i> Min: {{ forecast.min }}°C</span>
+                    <span><strong>Moy: {{ forecast.average | round(1) }}°C</strong></span>
+                    <span><i class="fas fa-cloud icon"></i> Ciel: {{ forecast.sky_condition }}</span> 
+                </p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if weather.error %}
+            <p class="error">{{ weather.error }}</p>
+        {% endif %}
+    </div>
+</body>
+</html>
